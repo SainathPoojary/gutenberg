@@ -48,6 +48,12 @@ function render_block_core_rss( $attributes ) {
 			$date = $item->get_date( 'U' );
 
 			if ( $date ) {
+				$gmt_offset = get_option( 'gmt_offset' );
+
+				$date = is_numeric( $gmt_offset )
+					? $date + (int) ( (float) $gmt_offset * HOUR_IN_SECONDS )
+					: $date;
+
 				$date = sprintf(
 					'<time datetime="%1$s" class="wp-block-rss__item-publish-date">%2$s</time> ',
 					esc_attr( date_i18n( 'c', $date ) ),
