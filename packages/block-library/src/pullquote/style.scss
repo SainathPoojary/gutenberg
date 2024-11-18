@@ -11,6 +11,10 @@
 		color: inherit;
 	}
 
+	cite {
+		display: block;
+	}
+
 	blockquote {
 		margin: 0;
 	}
@@ -68,8 +72,4 @@
 			font-style: normal;
 		}
 	}
-}
-
-.wp-block-pullquote cite {
-	color: inherit;
 }
