@@ -6,17 +6,33 @@ import PlainText from '..';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
- * Render an auto-growing textarea allow users to fill any textual content.
+ * Render an auto-growing textarea for user input.
  */
 const meta = {
 	title: 'BlockEditor/PlainText',
 	component: PlainText,
+	parameters: {
+		docs: {
+			canvas: { sourceState: 'shown' },
+		},
+		description: {
+			component:
+				'PlainText renders an auto-growing textarea that allows users to enter any textual content.',
+		},
+	},
 	argTypes: {
 		value: {
-			control: 'text',
+			control: {
+				type: null,
+			},
+			table: {
+				type: {
+					summary: 'string',
+				},
+			},
 			description: 'The current text value of the PlainText',
 		},
 		onChange: {
@@ -24,34 +40,33 @@ const meta = {
 			control: {
 				type: null,
 			},
+			table: {
+				type: {
+					summary: 'function',
+				},
+			},
 			description: 'Function called when the text value changes',
 		},
 		className: {
 			control: 'text',
+			table: {
+				type: {
+					summary: 'string',
+				},
+			},
 			description: 'Additional class name for the PlainText',
 		},
 	},
-	render: function Render( args ) {
-		const [ value, setValue ] = useState( '' );
-
-		const { value: argValue, className, onChange } = args;
-
-		useEffect( () => {
-			setValue( argValue );
-		}, [ argValue ] );
-
-		const handleOnChange = ( newValue ) => {
-			setValue( newValue );
-			if ( onChange ) {
-				onChange( newValue );
-			}
-		};
-
+	render: function Template( { onChange, ...args } ) {
+		const [ value, setValue ] = useState( args.value );
 		return (
 			<PlainText
+				{ ...args }
+				onChange={ ( ...changeArgs ) => {
+					onChange( ...changeArgs );
+					setValue( ...changeArgs );
+				} }
 				value={ value }
-				onChange={ handleOnChange }
-				className={ className }
 			/>
 		);
 	},
@@ -62,25 +77,6 @@ export default meta;
 export const Default = {
 	args: {
 		className: 'bold',
-		value: 'Type some text here...',
-	},
-};
-
-/**
- * PlainText component with a long text value to test auto-grow.
- */
-export const LongText = {
-	args: {
-		value: 'Type a long piece of text to see auto-grow in action...',
-	},
-};
-
-/**
- * PlainText component with a custom class name.
- */
-export const WithClassName = {
-	args: {
-		className: 'my-custom-class',
 		value: 'Type some text here...',
 	},
 };
