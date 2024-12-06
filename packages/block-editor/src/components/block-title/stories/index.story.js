@@ -13,7 +13,7 @@ import BlockTitle from '../';
 // Register core blocks for the story environment
 registerCoreBlocks();
 
-// Create more comprehensive sample blocks for testing
+// Create sample blocks for testing
 const blocks = [
 	createBlock( 'core/paragraph', {
 		content: 'This is a sample paragraph block.',
@@ -23,17 +23,9 @@ const blocks = [
 		level: 2,
 		content: 'Sample Heading Block',
 	} ),
-	createBlock(
-		'core/group',
-		{
-			layout: { type: 'flex', justifyContent: 'center' },
-		},
-		[
-			createBlock( 'core/paragraph', {
-				content: 'Nested paragraph within a group block',
-			} ),
-		]
-	),
+	createBlock( 'core/group', {
+		layout: { type: 'flex', justifyContent: 'center' },
+	} ),
 ];
 
 /**
@@ -54,9 +46,7 @@ const meta = {
 	decorators: [
 		( Story ) => (
 			<BlockEditorProvider value={ blocks }>
-				<div style={ { padding: '20px', backgroundColor: '#f0f0f0' } }>
-					<Story />
-				</div>
+				<Story />
 			</BlockEditorProvider>
 		),
 	],
@@ -68,17 +58,19 @@ const meta = {
 					[ blocks[ 0 ].clientId ]: "Paragraph's Client ID",
 					[ blocks[ 1 ].clientId ]: "Heading's Client ID",
 					[ blocks[ 2 ].clientId ]: "Group's Client ID",
-					[ blocks[ 2 ].innerBlocks[ 0 ].clientId ]:
-						"Nested Paragraph's Client ID",
 				},
 			},
 			options: [
 				blocks[ 0 ].clientId,
 				blocks[ 1 ].clientId,
 				blocks[ 2 ].clientId,
-				blocks[ 2 ].innerBlocks[ 0 ].clientId,
 			],
 			description: 'The client ID of the block to render',
+			table: {
+				type: {
+					summary: 'string',
+				},
+			},
 		},
 		maximumLength: {
 			control: {
@@ -88,10 +80,20 @@ const meta = {
 				step: 1,
 			},
 			description: 'Maximum length before title truncation',
+			table: {
+				type: {
+					summary: 'number',
+				},
+			},
 		},
 		context: {
 			control: { type: 'text' },
 			description: 'Optional context to pass to getBlockLabel',
+			table: {
+				type: {
+					summary: 'string',
+				},
+			},
 		},
 	},
 };
@@ -111,42 +113,5 @@ export const Default = {
 				story: 'Default rendering of BlockTitle for a paragraph block',
 			},
 		},
-	},
-};
-
-/**
- * Story variations demonstrating BlockTitle component with maximum length
- */
-export const WithMaxLength = {
-	args: {
-		clientId: blocks[ 0 ].clientId,
-		maximumLength: 5,
-	},
-};
-
-/**
- * Story variations demonstrating BlockTitle component with client ID of a heading block
- */
-export const HeadingBlock = {
-	args: {
-		clientId: blocks[ 1 ].clientId,
-	},
-};
-
-/**
- * Story variations demonstrating BlockTitle component with client ID of a paragraph block
- */
-export const ParagraphBlock = {
-	args: {
-		clientId: blocks[ 0 ].clientId,
-	},
-};
-
-/**
- * Story variations demonstrating BlockTitle component with client ID of a nested block within a group
- */
-export const NestedBlock = {
-	args: {
-		clientId: blocks[ 2 ].innerBlocks[ 0 ].clientId,
 	},
 };
