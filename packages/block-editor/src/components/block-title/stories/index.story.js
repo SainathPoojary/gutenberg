@@ -39,7 +39,7 @@ const meta = {
 			canvas: { sourceState: 'shown' },
 			description: {
 				component:
-					"The Block Title component renders a block's configured title as a string.",
+					"Renders the block's configured title as a string, or empty if the title cannot be determined.",
 			},
 		},
 	},
@@ -65,7 +65,7 @@ const meta = {
 				blocks[ 1 ].clientId,
 				blocks[ 2 ].clientId,
 			],
-			description: 'The client ID of the block to render',
+			description: 'Client ID of block.',
 			table: {
 				type: {
 					summary: 'string',
@@ -79,7 +79,8 @@ const meta = {
 				max: 50,
 				step: 1,
 			},
-			description: 'Maximum length before title truncation',
+			description:
+				'The maximum length that the block title string may be before truncated.',
 			table: {
 				type: {
 					summary: 'number',
@@ -88,7 +89,7 @@ const meta = {
 		},
 		context: {
 			control: { type: 'text' },
-			description: 'Optional context to pass to getBlockLabel',
+			description: 'The context to pass to `getBlockLabel`.',
 			table: {
 				type: {
 					summary: 'string',
@@ -106,12 +107,5 @@ export default meta;
 export const Default = {
 	args: {
 		clientId: blocks[ 0 ].clientId,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: 'Default rendering of BlockTitle for a paragraph block',
-			},
-		},
 	},
 };
