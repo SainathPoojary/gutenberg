@@ -1,26 +1,12 @@
 /**
  * Internal dependencies
  */
-import DateFormatPicker from '..';
+import DateFormatPicker from '../';
 
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
-
-/**
- * Date format options
- */
-const FORMAT_OPTIONS = [
-	null,
-	'Y-m-d',
-	'n/j/Y',
-	'n/j/Y g:i A',
-	'M j, Y',
-	'M j, Y g:i A',
-	'F j, Y',
-	'M j',
-];
+import { useState } from '@wordpress/element';
 
 /**
  * Storybook configuration for DateFormatPicker component
@@ -28,74 +14,59 @@ const FORMAT_OPTIONS = [
 export default {
 	title: 'BlockEditor/DateFormatPicker',
 	component: DateFormatPicker,
+	parameters: {
+		docs: {
+			canvas: { sourceState: 'shown' },
+			description: {
+				component:
+					'The `DateFormatPicker` component enables users to configure their preferred *date format*. This determines how dates are displayed.',
+			},
+		},
+	},
 	argTypes: {
 		defaultFormat: {
 			control: 'text',
-			description: 'Default date format to display',
+			description:
+				'The date format that will be used if the user selects "Default".',
+			table: {
+				type: { summary: 'string' },
+			},
 		},
 		format: {
-			control: 'select',
-			options: FORMAT_OPTIONS,
-			description: 'Selected date format',
+			control: { type: null },
+			description:
+				'The selected date format. If `null`, _Default_ is selected.',
+			table: {
+				type: { summary: 'string' },
+			},
 		},
 		onChange: {
 			action: 'onChange',
-			control: {
-				type: null,
+			control: { type: null },
+			description:
+				'Called when a selection is made. If `null`, _Default_ is selected.',
+			table: {
+				type: { summary: 'function' },
 			},
-			description: 'Callback function when date format changes',
 		},
-	},
-	render: function Render( { onChange, format, defaultFormat } ) {
-		const [ selectedFormat, setSelectedFormat ] = useState( format );
-
-		useEffect( () => {
-			setSelectedFormat( format );
-		}, [ format ] );
-
-		const handleFormatChange = ( newValue ) => {
-			setSelectedFormat( newValue );
-			if ( onChange ) {
-				onChange( newValue );
-			}
-		};
-
-		return (
-			<DateFormatPicker
-				defaultFormat={ defaultFormat }
-				format={ selectedFormat }
-				onChange={ handleFormatChange }
-			/>
-		);
 	},
 };
 
-/**
- * Story demonstrating DateFormatPicker with default settings
- */
 export const Default = {
 	args: {
 		defaultFormat: 'M j, Y',
-		format: 'Y-m-d',
 	},
-};
-
-/**
- * DateFormatPicker with format set to null and defaultFormat set to 'M j, Y'
- */
-export const WithFormatNull = {
-	args: {
-		defaultFormat: 'M j, Y',
-		format: null,
-	},
-};
-
-/**
- * DateFormatPicker with defaultFormat set to empty string and format set to 'Y-m-d'
- */
-export const WithDefaultFormatEmpty = {
-	args: {
-		defaultFormat: '',
-		format: 'Y-m-d',
+	render: function Template( { onChange, ...args } ) {
+		const [ format, setFormat ] = useState();
+		return (
+			<DateFormatPicker
+				{ ...args }
+				onChange={ ( ...changeArgs ) => {
+					onChange( ...changeArgs );
+					setFormat( ...changeArgs );
+				} }
+				format={ format }
+			/>
+		);
 	},
 };
