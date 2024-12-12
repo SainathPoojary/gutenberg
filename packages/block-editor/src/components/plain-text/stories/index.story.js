@@ -8,19 +8,16 @@ import PlainText from '..';
  */
 import { useState } from '@wordpress/element';
 
-/**
- * Render an auto-growing textarea for user input.
- */
 const meta = {
 	title: 'BlockEditor/PlainText',
 	component: PlainText,
 	parameters: {
 		docs: {
 			canvas: { sourceState: 'shown' },
-		},
-		description: {
-			component:
-				'PlainText renders an auto-growing textarea that allows users to enter any textual content.',
+			description: {
+				component:
+					'PlainText renders an auto-growing textarea that allows users to enter any textual content.',
+			},
 		},
 	},
 	argTypes: {
@@ -57,6 +54,11 @@ const meta = {
 			description: 'Additional class name for the PlainText',
 		},
 	},
+};
+
+export default meta;
+
+export const Default = {
 	render: function Template( { onChange, ...args } ) {
 		const [ value, setValue ] = useState( args.value );
 		return (
@@ -69,14 +71,5 @@ const meta = {
 				value={ value }
 			/>
 		);
-	},
-};
-
-export default meta;
-
-export const Default = {
-	args: {
-		className: 'bold',
-		value: 'Type some text here...',
 	},
 };
