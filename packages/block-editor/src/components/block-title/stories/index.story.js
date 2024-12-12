@@ -13,7 +13,7 @@ import BlockTitle from '../';
 // Register core blocks for the story environment
 registerCoreBlocks();
 
-// Create sample blocks for testing
+// Sample blocks for testing
 const blocks = [
 	createBlock( 'core/paragraph', {
 		content: 'This is a sample paragraph block.',
@@ -28,9 +28,6 @@ const blocks = [
 	} ),
 ];
 
-/**
- * Storybook configuration for BlockTitle component
- */
 const meta = {
 	title: 'BlockEditor/BlockTitle',
 	component: BlockTitle,
