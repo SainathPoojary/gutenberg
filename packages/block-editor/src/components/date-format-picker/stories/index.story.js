@@ -8,9 +8,6 @@ import DateFormatPicker from '../';
  */
 import { useState } from '@wordpress/element';
 
-/**
- * Storybook configuration for DateFormatPicker component
- */
 export default {
 	title: 'BlockEditor/DateFormatPicker',
 	component: DateFormatPicker,
