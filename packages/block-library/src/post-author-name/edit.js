@@ -15,7 +15,11 @@ import {
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 
 function PostAuthorNameEdit( {
 	context: { postType, postId },
@@ -69,26 +73,52 @@ function PostAuthorNameEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							isLink: false,
+							linkTarget: '_self',
+						} );
+					} }
+				>
+					<ToolsPanelItem
 						label={ __( 'Link to author archive' ) }
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
-					/>
-					{ isLink && (
+						isShownByDefault
+						hasValue={ () => isLink }
+						onDeselect={ () => setAttributes( { isLink: false } ) }
+					>
 						<ToggleControl
 							__nextHasNoMarginBottom
-							label={ __( 'Open in new tab' ) }
-							onChange={ ( value ) =>
-								setAttributes( {
-									linkTarget: value ? '_blank' : '_self',
-								} )
+							label={ __( 'Link to author archive' ) }
+							onChange={ () =>
+								setAttributes( { isLink: ! isLink } )
 							}
-							checked={ linkTarget === '_blank' }
+							checked={ isLink }
 						/>
+					</ToolsPanelItem>
+					{ isLink && (
+						<ToolsPanelItem
+							label={ __( 'Open in new tab' ) }
+							isShownByDefault
+							hasValue={ () => linkTarget !== '_self' }
+							onDeselect={ () =>
+								setAttributes( { linkTarget: '_self' } )
+							}
+						>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Open in new tab' ) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										linkTarget: value ? '_blank' : '_self',
+									} )
+								}
+								checked={ linkTarget === '_blank' }
+							/>
+						</ToolsPanelItem>
 					) }
-				</PanelBody>
+				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }> { displayAuthor } </div>
 		</>
