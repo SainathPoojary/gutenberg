@@ -6,7 +6,11 @@ import {
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { ToggleControl, PanelBody } from '@wordpress/components';
+import {
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
@@ -19,18 +23,30 @@ export default function ReadMore( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => setAttributes( { linkTarget: '_self' } ) }
+				>
+					<ToolsPanelItem
 						label={ __( 'Open in new tab' ) }
-						onChange={ ( value ) =>
-							setAttributes( {
-								linkTarget: value ? '_blank' : '_self',
-							} )
+						isShownByDefault
+						hasValue={ () => linkTarget !== '_self' }
+						onDeselect={ () =>
+							setAttributes( { linkTarget: '_self' } )
 						}
-						checked={ linkTarget === '_blank' }
-					/>
-				</PanelBody>
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ linkTarget === '_blank' }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<RichText
 				identifier="content"
