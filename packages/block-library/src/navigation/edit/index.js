@@ -31,7 +31,8 @@ import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	PanelBody,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -72,6 +73,7 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
+import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 
 function ColorTools( {
 	textColor,
@@ -583,13 +585,34 @@ function Navigation( {
 		`overlay-menu-preview`
 	);
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
-					<PanelBody title={ __( 'Display' ) }>
+					<ToolsPanel
+						label={ __( 'Display' ) }
+						resetAll={ () => {
+							setAttributes( {
+								overlayMenu: 'mobile',
+								openSubmenusOnClick: false,
+								showSubmenuIcon: true,
+								hasIcon: true,
+								icon: 'handle',
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
 						{ isResponsive && (
-							<>
+							<ToolsPanelItem
+								hasValue={ () => overlayMenuPreview }
+								label={ __( 'Overlay menu controls' ) }
+								onDeselect={ () =>
+									setOverlayMenuPreview( false )
+								}
+								isShownByDefault
+							>
 								<Button
 									__next40pxDefaultSize
 									className={ overlayMenuPreviewClasses }
@@ -625,63 +648,101 @@ function Navigation( {
 										/>
 									) }
 								</div>
-							</>
+							</ToolsPanelItem>
 						) }
-						<ToggleGroupControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
+
+						<ToolsPanelItem
+							hasValue={ () => overlayMenu !== 'mobile' }
 							label={ __( 'Overlay Menu' ) }
-							aria-label={ __( 'Configure overlay menu' ) }
-							value={ overlayMenu }
-							help={ __(
-								'Collapses the navigation options in a menu icon opening an overlay.'
-							) }
-							onChange={ ( value ) =>
-								setAttributes( { overlayMenu: value } )
+							onDeselect={ () =>
+								setAttributes( { overlayMenu: 'mobile' } )
 							}
-							isBlock
+							isShownByDefault
 						>
-							<ToggleGroupControlOption
-								value="never"
-								label={ __( 'Off' ) }
-							/>
-							<ToggleGroupControlOption
-								value="mobile"
-								label={ __( 'Mobile' ) }
-							/>
-							<ToggleGroupControlOption
-								value="always"
-								label={ __( 'Always' ) }
-							/>
-						</ToggleGroupControl>
+							<ToggleGroupControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Overlay Menu' ) }
+								aria-label={ __( 'Configure overlay menu' ) }
+								value={ overlayMenu }
+								help={ __(
+									'Collapses the navigation options in a menu icon opening an overlay.'
+								) }
+								onChange={ ( value ) =>
+									setAttributes( { overlayMenu: value } )
+								}
+								isBlock
+							>
+								<ToggleGroupControlOption
+									value="never"
+									label={ __( 'Off' ) }
+								/>
+								<ToggleGroupControlOption
+									value="mobile"
+									label={ __( 'Mobile' ) }
+								/>
+								<ToggleGroupControlOption
+									value="always"
+									label={ __( 'Always' ) }
+								/>
+							</ToggleGroupControl>
+						</ToolsPanelItem>
+
 						{ hasSubmenus && (
 							<>
-								<h3>{ __( 'Submenus' ) }</h3>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									checked={ openSubmenusOnClick }
-									onChange={ ( value ) => {
-										setAttributes( {
-											openSubmenusOnClick: value,
-											...( value && {
-												showSubmenuIcon: true,
-											} ), // Make sure arrows are shown when we toggle this on.
-										} );
-									} }
+								<ToolsPanelItem
+									hasValue={ () => openSubmenusOnClick }
 									label={ __( 'Open on click' ) }
-								/>
-
-								<ToggleControl
-									__nextHasNoMarginBottom
-									checked={ showSubmenuIcon }
-									onChange={ ( value ) => {
+									onDeselect={ () =>
 										setAttributes( {
-											showSubmenuIcon: value,
-										} );
-									} }
-									disabled={ attributes.openSubmenusOnClick }
+											openSubmenusOnClick: false,
+											showSubmenuIcon: true,
+										} )
+									}
+									isShownByDefault
+								>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										checked={ openSubmenusOnClick }
+										onChange={ ( value ) => {
+											setAttributes( {
+												openSubmenusOnClick: value,
+												...( value && {
+													showSubmenuIcon: true,
+												} ), // Make sure arrows are shown when we toggle this on.
+											} );
+										} }
+										label={ __( 'Open on click' ) }
+									/>
+								</ToolsPanelItem>
+
+								<ToolsPanelItem
+									hasValue={ () => ! showSubmenuIcon }
 									label={ __( 'Show arrow' ) }
-								/>
+									onDeselect={ () =>
+										setAttributes( {
+											showSubmenuIcon: true,
+										} )
+									}
+									isDisabled={
+										attributes.openSubmenusOnClick
+									}
+									isShownByDefault
+								>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										checked={ showSubmenuIcon }
+										onChange={ ( value ) => {
+											setAttributes( {
+												showSubmenuIcon: value,
+											} );
+										} }
+										disabled={
+											attributes.openSubmenusOnClick
+										}
+										label={ __( 'Show arrow' ) }
+									/>
+								</ToolsPanelItem>
 
 								{ submenuAccessibilityNotice && (
 									<div>
@@ -696,7 +757,7 @@ function Navigation( {
 								) }
 							</>
 						) }
-					</PanelBody>
+					</ToolsPanel>
 				) }
 			</InspectorControls>
 			<InspectorControls group="color">
