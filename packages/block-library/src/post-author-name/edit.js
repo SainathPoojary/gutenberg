@@ -21,6 +21,11 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+
 function PostAuthorNameEdit( {
 	context: { postType, postId },
 	attributes: { textAlign, isLink, linkTarget },
@@ -62,6 +67,8 @@ function PostAuthorNameEdit( {
 		displayName
 	);
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -81,6 +88,7 @@ function PostAuthorNameEdit( {
 							linkTarget: '_self',
 						} );
 					} }
+					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
 						label={ __( 'Link to author archive' ) }
