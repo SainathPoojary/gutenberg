@@ -1,12 +1,12 @@
 /**
- * Internal dependencies
- */
-import DateFormatPicker from '../';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import DateFormatPicker from '../';
 
 export default {
 	title: 'BlockEditor/DateFormatPicker',
@@ -34,7 +34,7 @@ export default {
 			description:
 				'The selected date format. If `null`, _Default_ is selected.',
 			table: {
-				type: { summary: 'string' },
+				type: { summary: 'string | null' },
 			},
 		},
 		onChange: {
