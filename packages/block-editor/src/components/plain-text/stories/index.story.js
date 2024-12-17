@@ -1,12 +1,12 @@
 /**
- * Internal dependencies
- */
-import PlainText from '..';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import PlainText from '..';
 
 const meta = {
 	title: 'BlockEditor/PlainText',
@@ -30,7 +30,7 @@ const meta = {
 					summary: 'string',
 				},
 			},
-			description: 'The current text value of the PlainText',
+			description: 'The current text value of the PlainText.',
 		},
 		onChange: {
 			action: 'onChange',
@@ -42,7 +42,7 @@ const meta = {
 					summary: 'function',
 				},
 			},
-			description: 'Function called when the text value changes',
+			description: 'Function called when the text value changes.',
 		},
 		className: {
 			control: 'text',
@@ -51,7 +51,7 @@ const meta = {
 					summary: 'string',
 				},
 			},
-			description: 'Additional class name for the PlainText',
+			description: 'Additional class name for the PlainText.',
 		},
 	},
 };
@@ -60,7 +60,7 @@ export default meta;
 
 export const Default = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState( args.value );
+		const [ value, setValue ] = useState();
 		return (
 			<PlainText
 				{ ...args }
