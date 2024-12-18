@@ -595,9 +595,9 @@ function Navigation( {
 						label={ __( 'Display' ) }
 						resetAll={ () => {
 							setAttributes( {
-								overlayMenu: 'mobile',
-								openSubmenusOnClick: false,
 								showSubmenuIcon: true,
+								openSubmenusOnClick: false,
+								overlayMenu: 'mobile',
 								hasIcon: true,
 								icon: 'handle',
 							} );
@@ -605,14 +605,7 @@ function Navigation( {
 						dropdownMenuProps={ dropdownMenuProps }
 					>
 						{ isResponsive && (
-							<ToolsPanelItem
-								hasValue={ () => overlayMenuPreview }
-								label={ __( 'Overlay menu controls' ) }
-								onDeselect={ () =>
-									setOverlayMenuPreview( false )
-								}
-								isShownByDefault
-							>
+							<>
 								<Button
 									__next40pxDefaultSize
 									className={ overlayMenuPreviewClasses }
@@ -648,7 +641,7 @@ function Navigation( {
 										/>
 									) }
 								</div>
-							</ToolsPanelItem>
+							</>
 						) }
 
 						<ToolsPanelItem
@@ -690,6 +683,7 @@ function Navigation( {
 
 						{ hasSubmenus && (
 							<>
+								<h3>{ __( 'Submenus' ) }</h3>
 								<ToolsPanelItem
 									hasValue={ () => openSubmenusOnClick }
 									label={ __( 'Open on click' ) }
