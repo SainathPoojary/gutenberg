@@ -30,7 +30,7 @@ const meta = {
 					summary: 'string',
 				},
 			},
-			description: 'The current text value of the PlainText.',
+			description: 'String value of the textarea.',
 		},
 		onChange: {
 			action: 'onChange',

@@ -46,8 +46,8 @@ import EditableText from '../editable-text';
  * ````
  *
  * @param {Object}   props          Component props.
- * @param {string}   props.value    String value of the textarea
- * @param {Function} props.onChange Called when the value changes
+ * @param {string}   props.value    String value of the textarea.
+ * @param {Function} props.onChange Function called when the text value changes.
  * @param {Object}   [props.ref]    The component forwards the `ref` property to the `TextareaAutosize` component.
  * @return {Element} Plain text component
  */
