@@ -37,6 +37,7 @@ const meta = {
 	],
 	argTypes: {
 		clientId: {
+			control: { type: null },
 			description: 'Client ID of block.',
 			table: {
 				type: {
@@ -45,9 +46,7 @@ const meta = {
 			},
 		},
 		maximumLength: {
-			control: {
-				type: 'number',
-			},
+			control: { type: 'number' },
 			description:
 				'The maximum length that the block title string may be before truncated.',
 			table: {
