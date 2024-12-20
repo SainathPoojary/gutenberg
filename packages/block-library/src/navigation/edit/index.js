@@ -631,16 +631,19 @@ function Navigation( {
 										</>
 									) }
 								</Button>
-								<div id={ overlayMenuPreviewId }>
-									{ overlayMenuPreview && (
+								{ overlayMenuPreview && (
+									<div
+										id={ overlayMenuPreviewId }
+										className="wp-block-navigation__overlay-menu-preview-controls"
+									>
 										<OverlayMenuPreview
 											setAttributes={ setAttributes }
 											hasIcon={ hasIcon }
 											icon={ icon }
 											hidden={ ! overlayMenuPreview }
 										/>
-									) }
-								</div>
+									</div>
+								) }
 							</>
 						) }
 
@@ -683,7 +686,9 @@ function Navigation( {
 
 						{ hasSubmenus && (
 							<>
-								<h3>{ __( 'Submenus' ) }</h3>
+								<h3 className="wp-block-navigation__submenu-header">
+									{ __( 'Submenus' ) }
+								</h3>
 								<ToolsPanelItem
 									hasValue={ () => openSubmenusOnClick }
 									label={ __( 'Open on click' ) }
@@ -739,7 +744,7 @@ function Navigation( {
 								</ToolsPanelItem>
 
 								{ submenuAccessibilityNotice && (
-									<div>
+									<div className="wp-block-navigation__submenu-accessibility-notice">
 										<Notice
 											spokenMessage={ null }
 											status="warning"
