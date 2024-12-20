@@ -34,7 +34,7 @@ const meta = {
 		className: {
 			control: 'text',
 			description:
-				'Additional class names added to the underlying `ToolsPanel` instance.',
+				'Additional class names added to the underlying ToolsPanel instance.',
 			table: {
 				type: { summary: 'string' },
 			},
@@ -56,23 +56,23 @@ const meta = {
 			},
 		},
 		children: {
-			control: 'text',
+			control: { type: null },
 			description:
-				'Displayed below the underlying `PanelColorGradientSettings` instance.',
+				'Displayed below the underlying PanelColorGradientSettings instance.',
 			table: {
 				type: { summary: 'ReactNode' },
 			},
 		},
 		title: {
 			control: 'text',
-			description: 'The title of the underlying `ToolsPanel`.',
+			description: 'The title of the underlying ToolsPanel.',
 			table: {
 				type: { summary: 'string' },
 			},
 		},
 		showTitle: {
 			control: 'boolean',
-			description: 'Whether to show the title of the `ToolsPanel`.',
+			description: 'Whether to show the title of the ToolsPanel.',
 			table: {
 				type: { summary: 'boolean' },
 			},
