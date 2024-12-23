@@ -17,7 +17,8 @@ function PatternsExplorer( { initialCategory, rootClientId } ) {
 	const [ selectedCategory, setSelectedCategory ] =
 		useState( initialCategory );
 
-	const patternCategories = usePatternCategories( rootClientId );
+	const { categories: patternCategories } =
+		usePatternCategories( rootClientId );
 
 	return (
 		<div className="block-editor-block-patterns-explorer">

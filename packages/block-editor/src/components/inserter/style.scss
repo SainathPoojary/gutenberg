@@ -648,3 +648,10 @@ $block-inserter-tabs-height: 44px;
 .block-editor-tabbed-sidebar__tabpanel .block-editor-inserter__help-text {
 	padding: 0 $grid-unit-30 $grid-unit-20;
 }
+
+.block-editor-inserter__block-patterns-tabs-container-spinner {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
