@@ -28,6 +28,12 @@
 			"clientNavigation": true
 		}
 	},
+	"example": {
+		"attributes": {
+			"height": "100px",
+			"width": "100%"
+		}
+	},
 	"editorStyle": "wp-block-spacer-editor",
 	"style": "wp-block-spacer"
 }
