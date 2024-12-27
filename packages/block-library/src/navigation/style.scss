@@ -166,7 +166,9 @@ $navigation-icon-size: 24px;
 
 		// Hide until hover or focus within.
 		opacity: 0;
-		transition: opacity 0.1s linear;
+		@media (prefers-reduced-motion: no-preference) {
+			transition: opacity 0.1s linear;
+		}
 		visibility: hidden;
 
 		// Don't take up space when the menu is collapsed.
