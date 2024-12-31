@@ -15,8 +15,11 @@
 	cursor: pointer;
 	-webkit-appearance: none;
 	background: none;
-	transition: box-shadow 0.1s linear;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: box-shadow 0.1s linear;
+	}
+
 	height: $button-size;
 	align-items: center;
 	box-sizing: border-box;
@@ -245,10 +248,13 @@
 		text-align: left;
 		color: $components-color-accent;
 		text-decoration: underline;
-		transition-property: border, background, color;
-		transition-duration: 0.05s;
-		transition-timing-function: ease-in-out;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition-property: border, background, color;
+			transition-duration: 0.05s;
+			transition-timing-function: ease-in-out;
+		}
+
 		height: auto;
 
 		&:focus {
