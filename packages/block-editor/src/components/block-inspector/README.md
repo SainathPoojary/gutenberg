@@ -22,9 +22,9 @@ const MyBlockInspector = () => <BlockInspector />;
 
 Whether to display a "No block selected" message when no block is selected.
 
-- Type: `boolean`
-- Required: No
-- Default: `true`
+-   Type: `boolean`
+-   Required: No
+-   Default: `true`
 
 ## Related components
 
