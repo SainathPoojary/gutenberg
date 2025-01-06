@@ -38,9 +38,8 @@ $color-palette-circle-spacing: 12px;
 
 	@media not (prefers-reduced-motion) {
 		transition: 100ms transform ease;
+		will-change: transform;
 	}
-
-	will-change: transform;
 
 	&:hover {
 		transform: scale(1.2);

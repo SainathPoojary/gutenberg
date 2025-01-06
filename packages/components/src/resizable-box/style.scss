@@ -63,9 +63,9 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 
 	@media not (prefers-reduced-motion) {
 		transition: transform 0.1s ease-in;
+		will-change: transform;
 	}
 
-	will-change: transform;
 	opacity: 0;
 }
 
