@@ -58,6 +58,7 @@ const UnforwardedFontSizePicker = (
 		withSlider = false,
 		withReset = true,
 		label = 'Size',
+		help,
 	} = props;
 
 	const units = useCustomUnits( {
@@ -132,8 +133,19 @@ const UnforwardedFontSizePicker = (
 		size,
 	} );
 
+	let helpLabel;
+	if ( help ) {
+		if ( typeof help === 'function' ) {
+			if ( value !== undefined ) {
+				helpLabel = help( value );
+			}
+		} else {
+			helpLabel = help;
+		}
+	}
+
 	return (
-		<BaseControl>
+		<BaseControl help={ helpLabel }>
 			<Container ref={ ref } className="components-font-size-picker">
 				<VisuallyHidden as="legend">
 					{ __( 'Font size' ) }
