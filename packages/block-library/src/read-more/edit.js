@@ -14,18 +14,26 @@ import {
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+
 export default function ReadMore( {
 	attributes: { content, linkTarget },
 	setAttributes,
 	insertBlocksAfter,
 } ) {
 	const blockProps = useBlockProps();
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<>
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
 					resetAll={ () => setAttributes( { linkTarget: '_self' } ) }
+					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
 						label={ __( 'Open in new tab' ) }
