@@ -57,7 +57,7 @@ const UnforwardedFontSizePicker = (
 		value,
 		withSlider = false,
 		withReset = true,
-		label = 'Size',
+		label = __( 'Size' ),
 		help,
 	} = props;
 
