@@ -11,6 +11,20 @@ import FontFamilyControl from '..';
 export default {
 	component: FontFamilyControl,
 	title: 'BlockEditor/FontFamilyControl',
+	argTypes: {
+		label: {
+			control: 'text',
+			table: {
+				type: { summary: 'string' },
+			},
+		},
+		help: {
+			control: 'text',
+			table: {
+				type: { summary: 'string | function' },
+			},
+		},
+	},
 };
 
 export const Default = {
