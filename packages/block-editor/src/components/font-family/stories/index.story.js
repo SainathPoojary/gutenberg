@@ -16,12 +16,13 @@ export default {
 			control: 'text',
 			table: {
 				type: { summary: 'string' },
+				defaultValue: { summary: 'Font' },
 			},
 		},
 		help: {
 			control: 'text',
 			table: {
-				type: { summary: 'string | function' },
+				type: { summary: 'string | function | element' },
 			},
 		},
 	},
