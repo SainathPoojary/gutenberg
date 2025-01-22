@@ -33,6 +33,8 @@
 	}
 
 	.wp-block-file__content-wrapper {
+		display: flex;
+		align-items: center;
 		flex-grow: 1;
 	}
 

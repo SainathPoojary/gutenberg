@@ -1,6 +1,8 @@
 .wp-block-file {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+	display: flex;
+	align-items: center;
 
 	&:not(.wp-element-button) {
 		font-size: 0.8em;
