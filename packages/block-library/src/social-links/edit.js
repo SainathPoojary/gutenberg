@@ -137,7 +137,7 @@ export function SocialLinksEdit( props ) {
 				setIconColor( colorValue );
 				setAttributes( { iconColorValue: colorValue } );
 			},
-			label: __( 'Icon color' ),
+			label: showLabels ? __( 'Icon & label color' ) : __( 'Icon color' ),
 			resetAllFilter: () => {
 				setIconColor( undefined );
 				setAttributes( { iconColorValue: undefined } );
