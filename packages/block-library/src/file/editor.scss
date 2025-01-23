@@ -35,6 +35,8 @@
 	.wp-block-file__content-wrapper {
 		display: flex;
 		align-items: center;
+		gap: 0.75em;
+		flex-wrap: wrap;
 		flex-grow: 1;
 	}
 
@@ -48,6 +50,5 @@
 
 	.wp-block-file__button-richtext-wrapper {
 		display: inline-block;
-		margin-left: 0.75em;
 	}
 }
