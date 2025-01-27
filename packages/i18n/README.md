@@ -51,7 +51,7 @@ Returns locale data by domain in a Jed-formatted JSON object shape.
 
 _Related_
 
--   <https://messageformat.github.io/Jed/>
+-   <http://messageformat.github.io/Jed/>
 
 _Parameters_
 
@@ -91,7 +91,7 @@ Resets all current Tannin instance locale data and sets the specified locale dat
 
 _Related_
 
--   <https://messageformat.github.io/Jed/>
+-   <http://messageformat.github.io/Jed/>
 
 _Parameters_
 
@@ -104,7 +104,7 @@ Merges locale data into the Tannin instance by domain. Accepts data in a Jed-for
 
 _Related_
 
--   <https://messageformat.github.io/Jed/>
+-   <http://messageformat.github.io/Jed/>
 
 _Parameters_
 
