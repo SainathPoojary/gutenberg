@@ -434,7 +434,7 @@ Returns a promise resolving to one of either a string or null. A string will be 
 
 _Related_
 
--   <http://php.net/manual/en/function.error-reporting.php>
+-   <https://php.net/manual/en/function.error-reporting.php>
 
 _Returns_
 
