@@ -35,8 +35,6 @@ const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
  * The `FontAppearanceControl` component renders a dropdown menu that displays font style and weight options for the selected font family.
  * This control dynamically adapts to show style/weight combinations supported by the active font.
  *
- * @since 6.8.0
- *
  * @example
  * ```jsx
  * import { FontAppearanceControl } from '@wordpress/block-editor';
