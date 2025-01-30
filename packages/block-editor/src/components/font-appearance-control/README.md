@@ -4,7 +4,6 @@ The `FontAppearanceControl` component renders a dropdown menu that displays font
 
 This component is primarily used in typography-related block settings (e.g., Paragraph, Heading, etc.) where users need to adjust visual appearance of text elements. Available options vary based on the font's capabilities.
 
-
 ## Usage
 
 Renders a font appearance selector with style/weight combinations.
