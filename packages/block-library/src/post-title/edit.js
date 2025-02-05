@@ -83,7 +83,9 @@ export default function PostTitleEdit( {
 		) : (
 			<TagName
 				{ ...blockProps }
-				dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
+				dangerouslySetInnerHTML={ {
+					__html: fullTitle?.rendered || __( '(no title)' ),
+				} }
 			/>
 		);
 	}
@@ -111,7 +113,7 @@ export default function PostTitleEdit( {
 					rel={ rel }
 					onClick={ ( event ) => event.preventDefault() }
 					dangerouslySetInnerHTML={ {
-						__html: fullTitle?.rendered,
+						__html: fullTitle?.rendered || __( '(no title)' ),
 					} }
 				/>
 			</TagName>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Server-side rendering of the `core/post-title` block.
  *
@@ -27,8 +28,8 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 	 */
 	$title = get_the_title();
 
-	if ( ! $title ) {
-		return '';
+	if (! $title) {
+		$title = __('(no title)');
 	}
 
 	$tag_name = 'h2';
