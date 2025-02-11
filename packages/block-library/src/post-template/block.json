@@ -16,6 +16,15 @@
 		"enhancedPagination",
 		"postType"
 	],
+	"attributes": {
+		"layout": {
+			"type": "object",
+			"default": {
+				"type": "default",
+				"columnCount": 3
+			}
+		}
+	},
 	"supports": {
 		"reusable": false,
 		"html": false,
