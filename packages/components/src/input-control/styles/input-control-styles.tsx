@@ -285,7 +285,6 @@ export const Input = styled.input< InputProps >`
 		${ customPaddings }
 
 		&::-webkit-input-placeholder {
-			line-height: normal;
 			color: ${ COLORS.ui.darkGrayPlaceholder };
 		}
 
