@@ -9,6 +9,12 @@ test.use( {
 	imageBlockUtils: async ( { page }, use ) => {
 		await use( new ImageBlockUtils( { page } ) );
 	},
+	imageLinkMedia: async ( { requestUtils }, use ) => {
+		const media = await requestUtils.uploadMedia(
+			'./assets/1024x768_e2e_test_image.png'
+		);
+		await use( media );
+	},
 } );
 
 test.describe( 'Image', () => {
@@ -694,6 +700,428 @@ test.describe( 'Image', () => {
 		const imageDom = figureDom.locator( 'img' );
 		await expect( imageDom ).toBeVisible();
 		await expect( imageDom ).toHaveAttribute( 'src', imgUrlWithHttps );
+	} );
+
+	test.describe( 'sidebar links', () => {
+		test.beforeEach( async ( { editor, imageLinkMedia } ) => {
+			await editor.insertBlock( {
+				name: 'core/image',
+				attributes: {
+					id: imageLinkMedia.id,
+					url: imageLinkMedia.source_url,
+					rel: 'nofollow sponsored',
+				},
+			} );
+			await editor.openDocumentSettingsSidebar();
+		} );
+
+		test( 'adds a custom URL and reflects toolbar edits in the sidebar', async ( {
+			editor,
+			page,
+		} ) => {
+			const url = new URL( '/?sidebar_link_test=1', page.url() ).href;
+			const updatedUrl = new URL( '/?sidebar_link_test=2', page.url() )
+				.href;
+			await page
+				.getByRole( 'combobox', { name: 'Link to', exact: true } )
+				.selectOption( 'custom' );
+			const picker = page.getByRole( 'button', { name: /Custom URL:/ } );
+			await picker.click();
+			await page
+				.getByRole( 'combobox', {
+					name: 'Search or type URL',
+					exact: true,
+				} )
+				.fill( url );
+			await page
+				.getByRole( 'option', { name: /sidebar_link_test=1/ } )
+				.click();
+			await expect
+				.poll( () => editor.getBlocks() )
+				.toMatchObject( [
+					{
+						attributes: { href: url, linkDestination: 'custom' },
+					},
+				] );
+			await expect( picker ).toContainText( 'sidebar_link_test=1' );
+			await picker.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect(
+				page.getByRole( 'combobox', {
+					name: 'Search or type URL',
+					exact: true,
+				} )
+			).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( picker ).toBeFocused();
+			await editor.clickBlockToolbarButton( 'Link' );
+			await page
+				.getByRole( 'button', { name: 'Edit', exact: true } )
+				.click();
+			await page
+				.getByRole( 'combobox', { name: 'URL', exact: true } )
+				.fill( updatedUrl );
+			await page
+				.getByRole( 'button', { name: 'Apply', exact: true } )
+				.click();
+			await page.keyboard.press( 'Escape' );
+			await expect( picker ).toContainText( 'sidebar_link_test=2' );
+			await expect
+				.poll( () => editor.getBlocks() )
+				.toMatchObject( [
+					{
+						attributes: {
+							href: updatedUrl,
+							linkDestination: 'custom',
+						},
+					},
+				] );
+		} );
+
+		test( 'preserves other link relations when changing the new tab setting', async ( {
+			editor,
+			page,
+		} ) => {
+			await page
+				.getByRole( 'combobox', { name: 'Link to', exact: true } )
+				.selectOption( 'media' );
+			const checkbox = page
+				.getByRole( 'tabpanel', { name: 'Content', exact: true } )
+				.getByRole( 'checkbox', {
+					name: 'Open in new tab',
+					exact: true,
+				} );
+			await checkbox.check();
+			await expect
+				.poll( () => editor.getBlocks() )
+				.toMatchObject( [
+					{
+						attributes: {
+							linkTarget: '_blank',
+							rel: 'nofollow sponsored noopener',
+						},
+					},
+				] );
+			await editor.clickBlockToolbarButton( 'Link' );
+			await page
+				.getByRole( 'button', { name: 'Link settings', exact: true } )
+				.click();
+			await expect(
+				page
+					.getByRole( 'dialog', { name: 'Edit URL', exact: true } )
+					.getByRole( 'checkbox', {
+						name: 'Open in new tab',
+						exact: true,
+					} )
+			).toBeChecked();
+			await page.keyboard.press( 'Escape' );
+			await checkbox.uncheck();
+			await expect
+				.poll(
+					async () => ( await editor.getBlocks() )[ 0 ].attributes
+				)
+				.toMatchObject( { rel: 'nofollow sponsored' } );
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.linkTarget
+			).toBeUndefined();
+		} );
+
+		test( 'clears the editable link fields when Media Reset all is used', async ( {
+			editor,
+			page,
+		} ) => {
+			await page
+				.getByRole( 'combobox', { name: 'Link to', exact: true } )
+				.selectOption( 'media' );
+			await page
+				.getByRole( 'checkbox', {
+					name: 'Open in new tab',
+					exact: true,
+				} )
+				.check();
+			await page
+				.getByRole( 'button', { name: 'Media options', exact: true } )
+				.click();
+			await page
+				.getByRole( 'menuitem', { name: 'Reset all', exact: true } )
+				.click();
+			const [ block ] = await editor.getBlocks();
+			expect( block.attributes.href ).toBeFalsy();
+			expect( block.attributes.linkTarget ).toBeUndefined();
+			expect( block.attributes.linkDestination ).toBe( 'none' );
+			expect( block.attributes.rel ).toBe( 'nofollow sponsored' );
+		} );
+
+		test( 'keeps the Attachment page selection while the media record loads', async ( {
+			editor,
+			page,
+			imageLinkMedia,
+		} ) => {
+			const destination = page.getByRole( 'combobox', {
+				name: 'Link to',
+				exact: true,
+			} );
+			await destination.selectOption( 'attachment' );
+			await editor.saveDraft();
+			let releaseMedia;
+			const mediaReady = new Promise( ( resolve ) => {
+				releaseMedia = resolve;
+			} );
+			let requestedMedia = false;
+			const mediaRoute = `**/wp/v2/media/${ imageLinkMedia.id }?*`;
+			await page.route( mediaRoute, async ( route ) => {
+				requestedMedia = true;
+				await mediaReady;
+				await route.continue();
+			} );
+			try {
+				await page.reload();
+				await editor.canvas
+					.getByRole( 'document', { name: 'Block: Image' } )
+					.click();
+				await editor.openDocumentSettingsSidebar();
+				await expect.poll( () => requestedMedia ).toBe( true );
+				await expect( destination ).toHaveValue( 'attachment' );
+				const [ block ] = await editor.getBlocks();
+				expect( block.attributes.href ).toBe( imageLinkMedia.link );
+			} finally {
+				if ( requestedMedia ) {
+					const response = page.waitForResponse( ( result ) =>
+						result
+							.url()
+							.includes( `/wp/v2/media/${ imageLinkMedia.id }?` )
+					);
+					releaseMedia();
+					await response;
+				} else {
+					releaseMedia();
+				}
+				await page.unroute( mediaRoute );
+			}
+		} );
+
+		test( 'keeps the sidebar in sync when a link is removed from the toolbar', async ( {
+			editor,
+			page,
+		} ) => {
+			const destination = page.getByRole( 'combobox', {
+				name: 'Link to',
+				exact: true,
+			} );
+			await destination.selectOption( 'media' );
+			await editor.clickBlockToolbarButton( 'Link' );
+			await page
+				.getByRole( 'button', { name: 'Remove link', exact: true } )
+				.click();
+			await page.keyboard.press( 'Escape' );
+			await expect( destination ).toHaveValue( 'none' );
+			await expect(
+				page.getByRole( 'checkbox', {
+					name: 'Open in new tab',
+					exact: true,
+				} )
+			).toBeHidden();
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.href
+			).toBeFalsy();
+			await destination.selectOption( 'media' );
+			await destination.selectOption( 'none' );
+			expect( await editor.getEditedPostContent() ).not.toContain(
+				'<a '
+			);
+		} );
+
+		test( 'hides link controls for decorative images and read-only image URLs', async ( {
+			page,
+		} ) => {
+			const destination = page.getByRole( 'combobox', {
+				name: 'Link to',
+				exact: true,
+			} );
+			await page
+				.getByRole( 'checkbox', {
+					name: 'Mark as decorative',
+					exact: true,
+				} )
+				.check();
+			await expect( destination ).toBeHidden();
+			await page
+				.getByRole( 'checkbox', {
+					name: 'Mark as decorative',
+					exact: true,
+				} )
+				.uncheck();
+			await expect( destination ).toBeVisible();
+			await page.evaluate( () => {
+				const { wp } = window;
+				const block = wp.data
+					.select( 'core/block-editor' )
+					.getBlocks()[ 0 ];
+				wp.blocks.registerBlockBindingsSource( {
+					name: 'testing/read-only-image-link',
+					label: 'Read-only image',
+					getValues: () => ( { url: block.attributes.url } ),
+					canUserEditValue: () => false,
+				} );
+				wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( block.clientId, {
+						metadata: {
+							bindings: {
+								url: { source: 'testing/read-only-image-link' },
+							},
+						},
+					} );
+			} );
+			await expect( destination ).toBeHidden();
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Link', exact: true } )
+			).toBeHidden();
+		} );
+
+		test( 'edits a Gallery Image from its parent List View', async ( {
+			editor,
+			page,
+			imageLinkMedia,
+		} ) => {
+			await editor.setContent( '' );
+			await editor.insertBlock( {
+				name: 'core/gallery',
+				innerBlocks: [
+					{
+						name: 'core/image',
+						attributes: {
+							id: imageLinkMedia.id,
+							url: imageLinkMedia.source_url,
+						},
+					},
+				],
+			} );
+			await page
+				.getByRole( 'tab', { name: 'List View', exact: true } )
+				.click();
+			await page
+				.getByRole( 'tabpanel', { name: 'List View', exact: true } )
+				.getByRole( 'link', { name: 'Image', exact: true } )
+				.click();
+			await page
+				.getByRole( 'combobox', { name: 'Link to', exact: true } )
+				.selectOption( 'media' );
+			await expect
+				.poll( () => editor.getBlocks() )
+				.toMatchObject( [
+					{
+						name: 'core/gallery',
+						innerBlocks: [
+							{
+								attributes: {
+									href: imageLinkMedia.source_url,
+									linkDestination: 'media',
+								},
+							},
+						],
+					},
+				] );
+			await page
+				.getByRole( 'combobox', { name: 'Link to', exact: true } )
+				.selectOption( 'attachment' );
+			await expect
+				.poll(
+					async () =>
+						( await editor.getBlocks() )[ 0 ].innerBlocks[ 0 ]
+							.attributes
+				)
+				.toMatchObject( {
+					href: imageLinkMedia.link,
+					linkDestination: 'attachment',
+				} );
+		} );
+	} );
+
+	test( 'keeps the shared image URL popup working in Media & Text', async ( {
+		editor,
+		page,
+		imageLinkMedia,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/media-text',
+			attributes: {
+				mediaId: imageLinkMedia.id,
+				mediaUrl: imageLinkMedia.source_url,
+				mediaType: 'image',
+				rel: 'nofollow sponsored',
+			},
+		} );
+		await editor.clickBlockToolbarButton( 'Link' );
+		await expect(
+			page.getByRole( 'menuitem', {
+				name: 'Link to attachment page',
+				exact: true,
+			} )
+		).toBeVisible();
+		await page
+			.getByRole( 'menuitem', {
+				name: 'Link to image file',
+				exact: true,
+			} )
+			.click();
+		await expect
+			.poll( () => editor.getBlocks() )
+			.toMatchObject( [
+				{
+					attributes: {
+						href: imageLinkMedia.source_url,
+						linkDestination: 'media',
+					},
+				},
+			] );
+		await page
+			.getByRole( 'button', { name: 'Link settings', exact: true } )
+			.click();
+		const newTab = page
+			.getByRole( 'dialog', { name: 'Edit URL', exact: true } )
+			.getByRole( 'checkbox', { name: 'Open in new tab', exact: true } );
+		await newTab.check();
+		await expect
+			.poll( () => editor.getBlocks() )
+			.toMatchObject( [
+				{
+					attributes: {
+						linkTarget: '_blank',
+						rel: 'nofollow sponsored noopener',
+					},
+				},
+			] );
+		await newTab.uncheck();
+		expect(
+			( await editor.getBlocks() )[ 0 ].attributes.linkTarget
+		).toBeUndefined();
+		expect( ( await editor.getBlocks() )[ 0 ].attributes.rel ).toBe(
+			'nofollow sponsored'
+		);
+		await page
+			.getByRole( 'button', { name: 'Remove link', exact: true } )
+			.click();
+		await page.keyboard.press( 'Escape' );
+		await editor.clickBlockToolbarButton( 'Link' );
+		await page
+			.getByRole( 'menuitem', {
+				name: 'Link to attachment page',
+				exact: true,
+			} )
+			.click();
+		await expect
+			.poll( () => editor.getBlocks() )
+			.toMatchObject( [
+				{
+					attributes: {
+						href: imageLinkMedia.link,
+						linkDestination: 'attachment',
+					},
+				},
+			] );
 	} );
 
 	test( 'adding a link should reflect configuration in published post content', async ( {
