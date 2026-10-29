@@ -71,6 +71,11 @@ import {
 	useBlockElement,
 } from './components/block-list/use-block-props/use-block-refs';
 import { LinkPicker } from './components/link-picker';
+import {
+	getImageLinkDestinations,
+	getImageLinkDestination,
+	getImageLinkTargetSettings,
+} from './components/url-popover/image-link-utils';
 import useRemoteUrlData from './components/link-control/use-rich-url-data';
 import { PrivateBlockContext } from './components/block-list/private-block-context';
 import useListViewPanelState from './components/use-list-view-panel-state';
@@ -150,6 +155,9 @@ lock( privateApis, {
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,
+	getImageLinkDestinations,
+	getImageLinkDestination,
+	getImageLinkTargetSettings,
 	useRemoteUrlData,
 	PrivateBlockContext,
 	useListViewPanelState,
