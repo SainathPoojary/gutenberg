@@ -50,11 +50,13 @@ import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { CheckboxControl } from '@wordpress/ui';
 import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
+import LinkDestinationControl from '../utils/link-destination-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
 	getActiveDimensionValue,
@@ -68,6 +70,10 @@ import {
 	ALLOWED_MEDIA_TYPES,
 	SIZED_LAYOUTS,
 	DEFAULT_MEDIA_SIZE_SLUG,
+	LINK_DESTINATION_NONE,
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_ATTACHMENT,
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
 
@@ -76,6 +82,8 @@ const {
 	ResolutionTool,
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
+	getImageLinkDestinations,
+	getImageLinkTargetSettings,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -528,6 +536,21 @@ export default function Image( {
 		setAttributes( props );
 	}
 
+	function onSetLinkDestination( destination, newHref ) {
+		onSetHref( {
+			linkDestination: destination,
+			href: newHref,
+			...( newHref && { lightbox: { enabled: false } } ),
+		} );
+		if ( destination === LINK_DESTINATION_NONE ) {
+			resetLightbox();
+		}
+	}
+
+	function onSetLinkTarget( value ) {
+		onSetHref( getImageLinkTargetSettings( value, rel ) );
+	}
+
 	function onSetLightbox( enable ) {
 		if ( enable && ! lightboxSetting?.enabled ) {
 			setAttributes( {
@@ -876,6 +899,30 @@ export default function Image( {
 
 	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
 
+	const linkDestinations = [
+		{ value: LINK_DESTINATION_NONE, label: __( 'None' ), url: '' },
+	];
+	// Keep the saved destination available while the attachment record loads.
+	const mediaLink =
+		image?.link ||
+		( linkDestination === LINK_DESTINATION_ATTACHMENT ? href : undefined );
+	const imageLinkDestinations = getImageLinkDestinations( {
+		mediaUrl: image?.source_url || url,
+		mediaLink,
+	} );
+	for ( const destination of imageLinkDestinations ) {
+		if ( destination.url ) {
+			linkDestinations.push( {
+				value: destination.linkDestination,
+				label:
+					destination.linkDestination === LINK_DESTINATION_MEDIA
+						? __( 'Media file' )
+						: __( 'Attachment page' ),
+				url: destination.url,
+			} );
+		}
+	}
+
 	const mediaControls = isSingleSelected && ! lockUrlControls && (
 		<>
 			{ /* For contentOnly mode, put this button in its own area so it has borders around it. */ }
@@ -905,7 +952,7 @@ export default function Image( {
 							onChangeUrl={ onSetHref }
 							linkDestination={ linkDestination }
 							mediaUrl={ ( image && image.source_url ) || url }
-							mediaLink={ image && image.link }
+							mediaLink={ mediaLink }
 							linkTarget={ linkTarget }
 							linkClass={ linkClass }
 							rel={ rel }
@@ -970,6 +1017,13 @@ export default function Image( {
 						resetAll={ () => {
 							onSelectImage( undefined );
 							setAttributes( { isDecorative: false } );
+							if ( showUrlInput ) {
+								onSetLinkDestination(
+									LINK_DESTINATION_NONE,
+									''
+								);
+								onSetLinkTarget( false );
+							}
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
@@ -1054,6 +1108,51 @@ export default function Image( {
 									) }
 								/>
 							</ToolsPanelItem>
+						) }
+						{ showUrlInput && (
+							<>
+								<ToolsPanelItem
+									label={ __( 'Link to' ) }
+									isShownByDefault
+									hasValue={ () => !! href }
+									onDeselect={ () =>
+										onSetLinkDestination(
+											LINK_DESTINATION_NONE,
+											''
+										)
+									}
+								>
+									<LinkDestinationControl
+										value={
+											linkDestination ||
+											( href
+												? LINK_DESTINATION_CUSTOM
+												: LINK_DESTINATION_NONE )
+										}
+										href={ href }
+										destinations={ linkDestinations }
+										onChange={ onSetLinkDestination }
+									/>
+								</ToolsPanelItem>
+								{ href && (
+									<ToolsPanelItem
+										label={ __( 'Open in new tab' ) }
+										isShownByDefault
+										hasValue={ () =>
+											linkTarget === '_blank'
+										}
+										onDeselect={ () =>
+											onSetLinkTarget( false )
+										}
+									>
+										<CheckboxControl
+											label={ __( 'Open in new tab' ) }
+											checked={ linkTarget === '_blank' }
+											onCheckedChange={ onSetLinkTarget }
+										/>
+									</ToolsPanelItem>
+								) }
+							</>
 						) }
 					</ToolsPanel>
 				</InspectorControls>
