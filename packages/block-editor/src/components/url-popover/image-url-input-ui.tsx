@@ -16,24 +16,20 @@ import {
 	__experimentalVStack as VStack,
 	ExternalLink,
 } from '@wordpress/components';
-import {
-	Icon,
-	link as linkIcon,
-	image,
-	page,
-	fullscreen,
-	linkOff,
-} from '@wordpress/icons';
+import { Icon, link as linkIcon, fullscreen, linkOff } from '@wordpress/icons';
 import { prependHTTPS } from '@wordpress/url';
 import type { FormEvent, ReactNode, RefObject, SyntheticEvent } from 'react';
 import URLPopover from './index';
-import type { ImageLinkDestination, ImageURLInputUIProps } from './types';
+import type { ImageURLInputUIProps } from './types';
+import {
+	getImageLinkDestinations,
+	getImageLinkDestination,
+	getImageLinkTargetSettings,
+} from './image-link-utils';
 
 const LINK_DESTINATION_NONE = 'none';
-const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
-const NEW_TAB_REL = [ 'noopener' ];
 
 const ImageURLInputUI = ( {
 	linkDestination,
@@ -50,6 +46,11 @@ const ImageURLInputUI = ( {
 	onSetLightbox,
 	resetLightbox,
 }: ImageURLInputUIProps ) => {
+	const linkDestinations = getImageLinkDestinations( {
+		mediaType,
+		mediaUrl,
+		mediaLink,
+	} );
 	const [ isOpen, setIsOpen ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -96,33 +97,6 @@ const ImageURLInputUI = ( {
 		setIsOpen( false );
 	};
 
-	const getUpdatedLinkTargetSettings = ( value: boolean ) => {
-		const newLinkTarget = value ? '_blank' : undefined;
-
-		let updatedRel;
-		if ( newLinkTarget ) {
-			const rels = ( rel ?? '' ).split( ' ' );
-			NEW_TAB_REL.forEach( ( relVal ) => {
-				if ( ! rels.includes( relVal ) ) {
-					rels.push( relVal );
-				}
-			} );
-			updatedRel = rels.join( ' ' );
-		} else {
-			const rels = ( rel ?? '' )
-				.split( ' ' )
-				.filter(
-					( relVal ) => NEW_TAB_REL.includes( relVal ) === false
-				);
-			updatedRel = rels.length ? rels.join( ' ' ) : undefined;
-		}
-
-		return {
-			linkTarget: newLinkTarget,
-			rel: updatedRel,
-		};
-	};
-
 	const onFocusOutside = () => {
 		return ( event: SyntheticEvent ) => {
 			// The autocomplete suggestions list renders in a separate popover (in a portal),
@@ -148,10 +122,10 @@ const ImageURLInputUI = ( {
 			if ( urlInput ) {
 				// It is possible the entered URL actually matches a named link destination.
 				// This check will ensure our link destination is correct.
-				const selectedDestination =
-					getLinkDestinations().find(
-						( destination ) => destination.url === urlInput
-					)?.linkDestination || LINK_DESTINATION_CUSTOM;
+				const selectedDestination = getImageLinkDestination(
+					urlInput,
+					linkDestinations
+				);
 
 				onChangeUrl( {
 					href: prependHTTPS( urlInput ),
@@ -172,46 +146,15 @@ const ImageURLInputUI = ( {
 		} );
 	};
 
-	const getLinkDestinations = () => {
-		const linkDestinations: ImageLinkDestination[] = [
-			{
-				linkDestination: LINK_DESTINATION_MEDIA,
-				title: __( 'Link to image file' ),
-				url: mediaType === 'image' ? mediaUrl : undefined,
-				icon: image,
-			},
-		];
-		if ( mediaType === 'image' && mediaLink ) {
-			linkDestinations.push( {
-				linkDestination: LINK_DESTINATION_ATTACHMENT,
-				title: __( 'Link to attachment page' ),
-				url: mediaType === 'image' ? mediaLink : undefined,
-				icon: page,
-			} );
-		}
-		return linkDestinations;
-	};
-
 	const onSetHref = ( value?: string ) => {
-		const linkDestinations = getLinkDestinations();
-		let linkDestinationInput: string;
-		if ( ! value ) {
-			linkDestinationInput = LINK_DESTINATION_NONE;
-		} else {
-			linkDestinationInput = (
-				linkDestinations.find( ( destination ) => {
-					return destination.url === value;
-				} ) || { linkDestination: LINK_DESTINATION_CUSTOM }
-			).linkDestination;
-		}
 		onChangeUrl( {
-			linkDestination: linkDestinationInput,
+			linkDestination: getImageLinkDestination( value, linkDestinations ),
 			href: value,
 		} );
 	};
 
 	const onSetNewTab = ( value: boolean ) => {
-		const updatedLinkTarget = getUpdatedLinkTargetSettings( value );
+		const updatedLinkTarget = getImageLinkTargetSettings( value, rel );
 		onChangeUrl( updatedLinkTarget );
 	};
 
@@ -259,7 +202,7 @@ const ImageURLInputUI = ( {
 		! lightboxEnabled || ( lightboxEnabled && ! showLightboxSetting );
 	const showLinkEditor = ! linkEditorValue && hideLightboxPanel;
 
-	const urlLabel = getLinkDestinations().find(
+	const urlLabel = linkDestinations.find(
 		( destination ) => destination.linkDestination === linkDestination
 	)?.title;
 
@@ -349,7 +292,7 @@ const ImageURLInputUI = ( {
 					additionalControls={
 						showLinkEditor && (
 							<NavigableMenu>
-								{ getLinkDestinations().map( ( link ) => (
+								{ linkDestinations.map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
 										icon={ link.icon }
