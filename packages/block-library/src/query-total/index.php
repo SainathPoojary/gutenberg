@@ -24,18 +24,33 @@ function render_block_core_query_total( $attributes, $content, $block ) {
 	if ( $block->context['query']['inherit'] ?? false ) {
 		$query_to_use = $wp_query;
 		$current_page = max( 1, (int) get_query_var( 'paged', 1 ) );
+		$max_rows     = $query_to_use->found_posts;
 	} else {
 		$page_key     = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-		$current_page = (int) ( $_GET[ $page_key ] ?? 1 );
+		$current_page = max( 1, (int) ( $_GET[ $page_key ] ?? 1 ) );
 		$query_to_use = new WP_Query( build_query_vars_from_query_block( $block, $current_page ) );
+		$max_rows     = $query_to_use->found_posts;
+
+		// WP_Query does not count the total for an empty page, so count it on page 1.
+		if ( 0 === $query_to_use->post_count && $current_page > 1 ) {
+			$count_query = new WP_Query(
+				array_merge(
+					build_query_vars_from_query_block( $block, 1 ),
+					array(
+						'posts_per_page' => 1,
+						'fields'         => 'ids',
+					)
+				)
+			);
+			$max_rows    = $count_query->found_posts;
+		}
 	}
 
-	$max_rows       = $query_to_use->found_posts;
 	$posts_per_page = (int) $query_to_use->get( 'posts_per_page' );
 
 	// Calculate the range of posts being displayed.
-	$start = ( 0 === $max_rows ) ? 0 : ( ( $current_page - 1 ) * $posts_per_page + 1 );
-	$end   = min( $start + $posts_per_page - 1, $max_rows );
+	$start = ( 0 === $query_to_use->post_count ) ? 0 : ( ( $current_page - 1 ) * $posts_per_page + 1 );
+	$end   = ( 0 === $start ) ? 0 : min( $start + $posts_per_page - 1, $max_rows );
 
 	// Prepare the display based on the `displayType` attribute.
 	$output = '';
